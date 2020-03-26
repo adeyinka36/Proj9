@@ -3,8 +3,8 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
-const routes = require('./routes')
-const bodyParser = require('bodyParser');
+const router = require('./routes')
+const bodyParser = require('body-parser');
 
 
 
@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 
 // TODO setup your api routes here
-app.use(routes)
+app.use("/api/",router)
 
 
 // send 404 if no other route matched

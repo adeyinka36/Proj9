@@ -6,7 +6,7 @@ const sequelize = new Sequelize({
     storage:"fsjstd-restapi.db"
   })
 
-    const User=sequelize.define({
+    const User=sequelize.define("User",{
       id:{
           type:Sequelize.INTEGER,
           autoIncreament:true,
@@ -54,12 +54,12 @@ const sequelize = new Sequelize({
     });
 
     
-User.hasdMany(Courses) 
+
 
 
 // coures model
 
-    const Courses= sequelize.define({
+    const Courses= sequelize.define("Courses",{
       id:{
           type:Sequelize.INTEGER,
           autoIncreament:true,
@@ -94,14 +94,14 @@ User.hasdMany(Courses)
   },
     });
 
-    
+User.hasMany(Courses)     
 Courses.belongsTo(User)
 
 
 models={
     Courses,
     User
-}
+};
 module.exports= models
 
 
