@@ -79,13 +79,17 @@ router.get('/',(req, res) => {
   
  // Creates a user, sets the Location header to "/", and returns no content 
   router.post('/users',async(req,res,next)=>{
-      const email=req.body.toJSON().emailAddress
+      
+      const email=req.body.emailAddress
       const emailValidationResult= validateEmail(email);
+      
       let  dataBaseEmails= await User.findAll();
-         dataBaseEmails= dataBaseEmails.toJSON()
+         dataBaseEmails= dataBaseEmails.map(m=>m.toJSON())
+
          const doestEmailAlreadyExist= dataBaseEmails.find(e=>e.emailAddress===email)
 
-if(emailValidationResult&&!doestEmailAlreadyExist){
+if(emailValidationResult && doestEmailAlreadyExist==""){
+    console.log("working now")
       try{
           req.body.password=bcrypt.hashSync(req.body.password)
           const data=  await User.build(req.body)
