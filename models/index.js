@@ -16,7 +16,7 @@ const sequelize = new Sequelize({
           type:Sequelize.STRING,
           allowNull:false,
           validate: {
-            notEmpty: {
+            notNull: {
               
               msg: 'Please provide a value for "firstName"',
            }
@@ -25,7 +25,7 @@ const sequelize = new Sequelize({
       lastName:{
           type:Sequelize.STRING,
           allowNull:false,validate: {
-            notEmpty: {
+            notNull: {
               
               msg: 'Please provide a value for "lastName"',
           }
@@ -35,7 +35,7 @@ const sequelize = new Sequelize({
           type:Sequelize.STRING,
           allowNull:false,
           validate: {
-            notEmpty: {
+            notNull: {
               // custom error message
               msg: 'Please provide a value for "title"',
           }
@@ -45,7 +45,7 @@ const sequelize = new Sequelize({
           type:Sequelize.STRING,
           allowNull:false,
           validate: {
-            notEmpty: {
+            notNull: {
     
               msg: 'Please provide a value for "password"',
           }
@@ -69,7 +69,7 @@ const sequelize = new Sequelize({
           type:Sequelize.STRING,
           allowNull:false,
           validate: {
-            notEmpty: {
+            notNull: {
              
               msg: 'Please provide a value for "title"',
             }
@@ -78,7 +78,7 @@ const sequelize = new Sequelize({
           type:Sequelize.TEXT,
           allowNull:false,
           validate: {
-            notEmpty: {
+            notNull: {
             
               msg: 'Please provide a value for "description"',
            }
@@ -92,14 +92,15 @@ const sequelize = new Sequelize({
         type:Sequelize.STRING,
       allowNull:true
   },
+
     });
 
-User.hasMany(Courses)     
+User.hasMany(Courses,{foreignKey:"userId"})     
 Courses.belongsTo(User)
 
 
 models={
-    Courses,
+    Course:Courses,
     User
 };
 module.exports= models

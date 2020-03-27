@@ -18,7 +18,7 @@ const app = express();
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 
 // TODO setup your api routes here
