@@ -5,7 +5,6 @@ const bcrypt = require('bcryptjs');
 const auth = require('basic-auth');
 const { User }= models;
 const { Course }= models;
-const bodyParser = require('body-parser');
 
 
 // authentication middlewear
@@ -39,6 +38,7 @@ const authenticate= async (req,res,next)=>{
     }
   if(message){
       const err = new Error(message)
+      err.status=401
       next(err)
   }
   else{
@@ -79,26 +79,28 @@ router.get('/',(req, res) => {
   
  // Creates a user, sets the Location header to "/", and returns no content 
   router.post('/users',async(req,res,next)=>{
-      
+      const userPassword = req.body.password
       const email=req.body.emailAddress
       const emailValidationResult= validateEmail(email);
       
       let  dataBaseEmails= await User.findAll();
          dataBaseEmails= dataBaseEmails.map(m=>m.toJSON())
 
-         const doestEmailAlreadyExist= dataBaseEmails.find(e=>e.emailAddress===email)
+
+         const doesEmailAlreadyExist= dataBaseEmails.find(e=>e.emailAddress===email)
+         
          console.log(emailValidationResult)
          console.log("yes")
-         console.log(doestEmailAlreadyExist)
-if(emailValidationResult && !doestEmailAlreadyExist){
-    console.log("working now")
+        
+if(emailValidationResult && !doesEmailAlreadyExist ){
+    if(!req.body.password) return res.status(400).json({message:"please provide valid password"})
 
       try{
           req.body.password=bcrypt.hashSync(req.body.password)
           const data=  await User.build(req.body)
           await data.save()
           console.log("sucess")
-        res.status(201).end()
+        res.status(201).setHeader("Location","/")
       }catch(error){
         if(error.name=== 'SequelizeValidationError'){
             const errors = error.errors.map(err => err.message);
@@ -166,7 +168,7 @@ if(emailValidationResult && !doestEmailAlreadyExist){
         let dataId= req.currentUser.id
         
          
-        res.status(201).json({location:`/api/courses/${dataId}`}).end()
+        res.status(201).setHeader("Location",`/courses/${data.id}`)
         console.log(sucess)
      }catch(error){
          if(error.name==="SequelizeValidationError"){
@@ -182,18 +184,20 @@ if(emailValidationResult && !doestEmailAlreadyExist){
 
   //Updates a course and returns no content
   router.put('/courses/:id',authenticate, async (req,res)=>{
-    const userCourser = await Course.findByPk(req.params.id)
-    const userIdofCourse= userCourser.userId
-
+    let  userCourse = await Course.findByPk(req.params.id)
+    userCourse= userCourse.toJSON()
+    const userIdofCourse= userCourse.userId
+    console.log(req.body)
+    if(req.body.title && req.body.description){
      if (req.currentUser.id===userIdofCourse){
          
       try{
         console.log("here")
-    
-        Course.update(req.body,{where:{id:req.params.id}})
+        console.log(req.body)
+        const updateCourse = await Course.findByPk(req.params.id);
+        await  updateCourse.update(req.body,{where:{id:req.params.id}});
         
-        res.status(201).end()
-        console.log(sucess)
+        res.status(204).end()
       
     }catch(error){
         if(error.name==="SequelizeValidataionError"){
@@ -201,14 +205,18 @@ if(emailValidationResult && !doestEmailAlreadyExist){
         res.status(403).end()
         }
         else{
-            res.status(403).end()
+            res.status(400).end()
             console.log(`this is is not a validation error ${error}`)
         }
       }
 }
 else{
-   res.status(403).json({message:"you do not have access to this course"})
+   res.status(400).json({message:"you do not have access to this course"})
 }
+    }
+    else{
+        res.status(400).json({message:"please enter title and description"})
+    }
 })
 
 

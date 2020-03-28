@@ -67,6 +67,7 @@ const sequelize = new Sequelize({
       },
       title:{
           type:Sequelize.STRING,
+          notEmpty:true,
           allowNull:false,
           validate: {
             notNull: {
@@ -101,7 +102,8 @@ Courses.belongsTo(User)
 
 models={
     Course:Courses,
-    User
+    User,
+    sequelize
 };
 module.exports= models
 
