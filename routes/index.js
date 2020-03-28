@@ -91,9 +91,10 @@ router.get('/',(req, res) => {
          
          console.log(emailValidationResult)
          console.log("yes")
+         if(!req.body.emailAddress){res.status(400).json({message:"Please provide an email adress"})}
         
 if(emailValidationResult && !doesEmailAlreadyExist ){
-    if(!req.body.password) return res.status(400).json({message:"please provide valid password"})
+    if(!req.body.password){ return res.status(400).json({message:"please provide valid password"})}
 
       try{
           req.body.password=bcrypt.hashSync(req.body.password)
@@ -107,13 +108,15 @@ if(emailValidationResult && !doesEmailAlreadyExist ){
         if(error.name=== 'SequelizeValidationError'){
             const errors = error.errors.map(err => err.message);
             console.error('Validation errors: ', errors);
-            res.status(400).json(errors)
+            return res.status(400).json(errors)
         }
-        throw error
+        
+        console.log(`this is not a validation error: ${error}`)
+        return res.status(500).json({message:"Sorry there was an error on the server side"})
       }
     }
     else{
-        res.status(400).json({message:"email already exists in database or is invalid please check"})
+       return  res.status(400).json({message:"email already exists in database or is invalid please check"})
     }
   });
 
@@ -164,6 +167,7 @@ if(emailValidationResult && !doesEmailAlreadyExist ){
 
   //Creates a course, sets the Location header to the URL for the course, and returns no content
   router.post('/courses/',authenticate, async (req,res,next)=>{
+      
      try{
        
          req.body.userId=req.currentUser.id
@@ -230,12 +234,13 @@ else{
 
     // Deletes a course and returns no content
   router.delete('/courses/:id',authenticate,async (req,res)=>{
-    const userCourser = await Course.findByPk(req.params.id)
-    const userIdofCourse= userCourser.userId
-    if (req.currentUser.id===userIdofCourse){
+    const userCourse = await Course.findByPk(req.params.id)
+    if (!userCourse){return res.status(404).json({message:"Course not found"})}
+    const userIdofCourse= userCourse.userId
+    if (req.currentUse.id===userIdofCourse){
        const courseTodelete = await Course.findByPk(req.params.id)
       await courseTodelete.destroy()
-  
+      
     res.status(204).end()
 }
  else{
