@@ -100,7 +100,9 @@ if(emailValidationResult && !doesEmailAlreadyExist ){
           const data=  await User.build(req.body)
           await data.save()
           console.log("sucess")
-        res.status(201).setHeader("Location","/")
+
+        res.setHeader("location","/")
+        return res.status(201).end()
       }catch(error){
         if(error.name=== 'SequelizeValidationError'){
             const errors = error.errors.map(err => err.message);
@@ -163,13 +165,17 @@ if(emailValidationResult && !doesEmailAlreadyExist ){
   //Creates a course, sets the Location header to the URL for the course, and returns no content
   router.post('/courses/',authenticate, async (req,res,next)=>{
      try{
+       
          req.body.userId=req.currentUser.id
-        let data = await Course.create(req.body)
-        let dataId= req.currentUser.id
+         const newCourse = await   Course.build(req.body)
+          await newCourse.save()
+          let  data= await Course.findAll({where:{"title":req.body.title}})
+          data  =  data.map(m=>m.toJSON())
+          console.log(data)
         
-         
-        res.status(201).setHeader("Location",`/courses/${data.id}`)
-        console.log(sucess)
+        res.setHeader("location",`api/courses/${data[0].id}`)
+        return res.status(201).end()
+        
      }catch(error){
          if(error.name==="SequelizeValidationError"){
              const errors = error.errors.map(err=>err.message)
@@ -177,6 +183,8 @@ if(emailValidationResult && !doesEmailAlreadyExist ){
             return  res.status(400).json(errors)
          }
          console.log(`this is not a validation error: ${error}`)
+         return res.status(500).json({message:"server error"})
+         
      }
     
   }) 
