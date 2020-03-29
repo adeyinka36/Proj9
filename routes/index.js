@@ -123,7 +123,7 @@ if(emailValidationResult && !doesEmailAlreadyExist ){
   
   
   // Returns a list of courses
-  router.get('/courses',authenticate,async (req,res)=>{
+  router.get('/courses',async (req,res)=>{
         let courses = await Course.findAll({
         attributes: {
           exclude: ["createdAt", "updatedAt"]

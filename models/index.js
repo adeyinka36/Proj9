@@ -37,7 +37,7 @@ const sequelize = new Sequelize({
           validate: {
             notNull: {
               // custom error message
-              msg: 'Please provide a value for "title"',
+              msg: 'Please provide a value for "emailAdress"',
           }
         }
     },
