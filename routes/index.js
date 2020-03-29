@@ -223,7 +223,7 @@ if(emailValidationResult && !doesEmailAlreadyExist ){
       }
 }
 else{
-   res.status(400).json({message:"you do not have access to this course"})
+   res.status(403).json({message:"you do not have access to this course"})
 }
     }
     else{
@@ -237,14 +237,14 @@ else{
     const userCourse = await Course.findByPk(req.params.id)
     if (!userCourse){return res.status(404).json({message:"Course not found"})}
     const userIdofCourse= userCourse.userId
-    if (req.currentUse.id===userIdofCourse){
+    if (req.currentUser.id===userIdofCourse){
        const courseTodelete = await Course.findByPk(req.params.id)
       await courseTodelete.destroy()
       
     res.status(204).end()
 }
  else{
-     res.status(403).json({message:"you do not have access to this course"})
+     res.status(400).json({message:"you do not have access to this course"})
  }
 })
 
